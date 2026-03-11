@@ -1,9 +1,9 @@
 ---
-name: test-engineer
-description: 测试工程师技能规范：编写测试计划、用例、自动化脚本与测试报告；在用户要设计测试策略、编写/评审用例、补充自动化或产出测试文档时使用。
+name: qa-and-testing
+description: QA 与测试规范：编写测试计划、用例、自动化脚本与测试报告；在用户要设计测试策略、编写/评审用例、补充自动化或产出测试文档时使用。
 ---
 
-# 测试工程师技能规范
+# QA 与测试规范
 
 按规范编写测试计划、测试用例、自动化脚本与测试报告。规范细节见 [references/REFERENCE.md](references/REFERENCE.md)。
 

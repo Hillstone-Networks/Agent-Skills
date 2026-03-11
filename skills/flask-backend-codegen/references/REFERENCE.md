@@ -58,8 +58,15 @@
 - 接口测试：`test_api_*.py`；业务逻辑：`test_service_*.py`。
 - 测试方法命名：`test_{场景}_{预期}`，如 `test_login_success_returns_token`。
 
+## 中间件与配置
+
+- **优先使用常见中间件**：开发中优先选用项目内或生态内常见中间件（Redis、消息队列、缓存、日志等）。
+- **询问访问方式**：涉及 Redis、消息队列、外部 API、数据库等时，向用户询问访问方式（连接串、主机/端口、认证方式等），据此写配置说明与示例。
+- **.env.example**：所有相关配置项（变量名、说明、示例或占位符）写入 `.env.example`；不提交真实密钥与连接串。
+- **.env**：实际连接串、密钥、地址等由开发者在本地 `.env` 中填写；文档或注释中说明「具体用法/取值请在 `.env` 中补充」。
+
 ## 开发流程与禁止事项
 
-- 新功能：先查阅 docs/ 与 context/；设计 URL、请求响应、权限；在 policies.py 补充策略并 `flask sync-permissions`；实现 Service 再写路由；更新技术文档。
-- 允许修改：`app/routes/`、`app/models/`、`app/service/`、`app/permission/policies.py`、`app/schemas/`。
-- 禁止：修改 `app/__init__.py` 核心初始化；在路由中直接操作 db/ORM；硬编码密钥；绕过 Casbin。
+- 新功能：先查阅 docs/ 与 context/；设计 URL、请求响应、权限；在 policies.py 补充策略并 `flask sync-permissions`；实现 Service 再写路由；涉及中间件时更新 `.env.example`；更新技术文档。
+- 允许修改：`app/routes/`、`app/models/`、`app/service/`、`app/permission/policies.py`、`app/schemas/`、`.env.example`。
+- 禁止：修改 `app/__init__.py` 核心初始化；在路由中直接操作 db/ORM；硬编码密钥；绕过 Casbin；将真实密钥写入仓库。

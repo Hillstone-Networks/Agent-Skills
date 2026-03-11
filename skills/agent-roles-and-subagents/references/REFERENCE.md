@@ -95,3 +95,9 @@ flowchart LR
 ```
 
 可据此生成「阶段→角色→产出→下游」的交接清单，写入各角色的 `handoff`。
+
+---
+
+## 创建 Cursor 子代理
+
+将角色定义转为 Cursor 子代理的流程、目录、格式与最佳实践见本技能 SKILL.md 的「第二部分：创建子代理」；格式参考 [Cursor 子代理文档](https://cursor.com/cn/docs/subagents)。子代理模板见 `assets/subagent-cursor-template.md`。

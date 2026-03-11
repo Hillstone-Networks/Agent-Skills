@@ -1,6 +1,6 @@
 ---
 name: flask-backend-codegen
-description: 项目规范生成 Flask API 后端代码（路由、Service、Model、Schema、权限策略与测试）。在用户要新增接口、新资源模块、或按规范生成/补全后端代码时使用。
+description: 项目规范生成 Flask API 后端代码（路由、Service、Model、Schema、权限策略与测试）；开发中优先使用常见中间件，配置写入 .env.example、用法在 .env 补充。在用户要新增接口、新资源模块、或按规范生成/补全后端代码时使用。
 ---
 
 # Flask 后端代码生成
@@ -23,12 +23,19 @@ description: 项目规范生成 Flask API 后端代码（路由、Service、Mode
 - **权限**：资源与动作（如 `user` + `read`/`create`/`update`/`delete`），是否需在 `policies.py` 中新增
 - **已有约定**：项目内是否有 `docs/xxx.md`、接口契约或错误码表，优先遵从
 
-### 2. 查阅规范
+### 2. 中间件与配置
+
+- **优先使用常见中间件**：开发过程中优先选用项目内或生态内常见的中间件（如 Redis、消息队列、缓存、日志等），避免自造轮子。
+- **向用户询问访问方式**：若涉及 Redis、消息队列、外部 API、数据库等，**向用户询问访问方式**（如连接串、主机/端口、认证方式、是否已有内网地址等），据此生成配置项说明与示例。
+- **配置写入 .env.example**：所有相关配置项（变量名、说明、示例值或占位符）**补充到 `.env.example`**；不在代码中硬编码。
+- **用法在 .env 中补充**：实际连接串、密钥、地址等**不在仓库提交**，由开发者在本地 `.env` 中填写；在文档或注释中说明「具体用法/取值请在 `.env` 中补充」。
+
+### 3. 查阅规范
 
 - 若存在 **docs/xx规范.md**：优先读取其中的接口规范、分页格式、错误码、DB 命名、权限元组、RequestParser 约定。
 - 无则按 [references/REFERENCE.md](references/REFERENCE.md) 的通用约定生成。
 
-### 3. 按规范生成代码
+### 4. 按规范生成代码
 
 生成顺序与要点：
 
@@ -63,14 +70,15 @@ description: 项目规范生成 Flask API 后端代码（路由、Service、Mode
    - `conftest.py` 提供 app、client、db 等 fixture。
    - 测试方法命名：`test_{场景}_{预期}`。
 
-### 4. 代码规范
+### 5. 代码规范
 
 - Python 3.12+；类型注解；PEP 8，建议 Ruff。
 - 文件名小写下划线；类名大驼峰；函数/变量小写下划线；常量全大写下划线。
 - 导入顺序：标准库 → 第三方 → 本地模块，空行分隔。
 - 禁止：硬编码密钥/密码；在路由层直接写 SQL/ORM；绕过 Casbin 做权限判断；信任前端传参做权限。
+- **配置与中间件**：中间件与外部服务所需配置从环境变量读取；新增配置项写入 `.env.example`（含变量名与说明），实际取值在 `.env` 中由开发者补充。
 
-### 5. 交付物清单
+### 6. 交付物清单
 
 单次生成应包含（按需）：
 
@@ -80,7 +88,8 @@ description: 项目规范生成 Flask API 后端代码（路由、Service、Mode
 4. `app/service/{resource}_service.py` 及方法
 5. `app/routes/{resource}_api.py`（Resource + RequestParser + @permission_required）
 6. `tests/test_api_{resource}.py` 和/或 `tests/test_service_{resource}.py`
-7. 若接口/错误码有约定，同步更新 `docs/` 或 `context/` 下技术文档
+7. 若涉及中间件或外部服务（Redis、消息队列、外部 API 等），在 `.env.example` 中补充对应变量与说明，并注明「具体用法/取值请在 `.env` 中补充」
+8. 若接口/错误码有约定，同步更新 `docs/` 或 `context/` 下技术文档
 
 ## 资产与参考
 
