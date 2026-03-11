@@ -53,7 +53,7 @@ npx skills add Hillstone-Networks/Agent-Skills -a cursor -y
 | **flask-backend-codegen** | Flask 后端代码生成：按项目规范生成 Flask API 代码（路由 Resource、Service、Model、Schema、权限策略与测试）；在用户要新增接口、新资源模块或按规范生成/补全后端代码时使用；遵循 RequestParser、AppResponse、分页与权限约定。 |
 | **agent-roles-and-subagents** | 角色规划与子代理创建：按场景规划多角色 Agent 定义并生成可复用配置；将角色定义转为 Cursor/Claude/Codex 子代理（.cursor/agents/*.md）；执行前查询可用技能并询问用户约束；适用于多智能体团队规划与「Help me create this subagent for Cursor」类请求。 |
 | **init-flask-backend** | 初始化 Flask 后端项目：按分层架构与规范搭建 Flask API 后端，包含应用工厂、Blueprint/Flask-RESTful 路由、Service/Model 分层、权限（JWT + Casbin）与统一响应；在用户要创建或生成 Flask 后端、REST API 项目时使用；支持 uv 依赖管理。 |
-| **qa-and-testing** | QA 与测试规范：编写测试计划、用例、自动化脚本与测试报告；在用户要设计测试策略、编写/评审用例、补充自动化或产出测试文档时使用；遵循用例 ID、步骤预期、优先级与自动化命名约定。 |
+| **qa-and-testing** | 编写测试计划、用例、自动化脚本与测试报告；系统性排错与根因分析（先根因、后修复，禁止只治标）。在用户要设计测试策略、编写/评审用例、补充自动化、产出测试文档，或排查缺陷、分析测试失败、定位异常行为时使用。 |
 
 ## 支持的 Agent
 
