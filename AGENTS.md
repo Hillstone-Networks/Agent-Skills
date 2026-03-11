@@ -36,6 +36,9 @@ Agent-Skills/
     │   ├── SKILL.md
     │   └── assets/templates/
     │       └── AGENTS.template.md
+    ├── qa-and-testing/
+    │   ├── SKILL.md    # 测试工程师规范（测试计划、用例、自动化、报告）
+    │   └── references/ # 用例格式、优先级、自动化与报告约定
     └── <skill-name>/   # 每个技能一个目录
         └── SKILL.md    # 技能定义（含 YAML frontmatter）
 ```
@@ -84,6 +87,9 @@ Agent-Skills/
 | **init-react-frontend** | 初始化 React 前端项目：默认技术栈为 React + Ant Design + react-router + TypeScript + Zustand + Vitest + jsdom + Tailwind CSS + Axios + Vite + Rolldown，依赖采用生成时最新版本，并生成适配该项目的 AGENTS.md。 |
 | **frontend-codegen** | 前端代码生成：在既有 React 项目中按规范生成功能/页面/组件；复用优先（工具与组件）、UI 与业务分层、数据化路由、测试先行（红/绿）、函数组件；新增第三方库时提供 3 选方案供确认。 |
 | **init-taro-miniapp** | 初始化 Taro 小程序项目：强制使用 `npx @tarojs/cli init <projectName>` 创建项目；初始化后必须执行 npm install，再新建目录、配置接口 dev proxy、可添加/更新 README 与 AGENTS.md，不修改其余文件或配置。 |
+
+| **qa-and-testing** | QA 与测试规范：编写测试计划、用例、自动化脚本与测试报告；在用户要设计测试策略、编写/评审用例、补充自动化或产出测试文档时使用；遵循用例 ID、步骤预期、优先级与自动化命名约定。 |
+| **agent-roles-and-subagents** | 角色规划与子代理创建：按场景规划多角色定义并生成配置；将角色定义转为 Cursor 子代理（.cursor/agents/*.md）；参考 Cursor 子代理文档；适用于多智能体规划与「Help me create this subagent for Cursor」请求。 |
 
 ---
 
