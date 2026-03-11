@@ -1,64 +1,69 @@
 # AGENTS.md — {{PROJECT_NAME}}
 
-> 本文件为在本项目工作的 AI 助手提供共享记忆。请保持内容准确并随项目演进更新。仅追加条目；未经团队同意勿删除已有内容。
+> This file provides shared context for AI assistants working in this project. Keep it accurate and update it as the project evolves. Only append; do not remove existing content without team agreement.
 
 ---
 
-## 项目概览
+## Project overview
 
-**名称：** {{PROJECT_NAME}}  
-**描述：** {{PROJECT_DESCRIPTION}}  
-**类型：** 前端应用
+**Name:** {{PROJECT_NAME}}  
+**Description:** {{PROJECT_DESCRIPTION}}  
+**Type:** Frontend application
 
 ---
 
-## 技术栈与资源
+## Tech stack and resources
 
 {{TECH_STACK_TABLE}}
 
 ---
 
-## 仓库/目录结构
+## Repository / directory structure
 
 ```
 {{DIR_STRUCTURE}}
 ```
 
-- 入口：`index.html` → `src/main.tsx`
-- 路由与根组件：`src/App.tsx`
-- 页面组件：`src/pages/`
-- 状态：`src/store/`（Zustand）
-- 请求：`src/api/` 或 `src/services/`（Axios）
-- 测试：Vitest，用例与源码同目录或 `src/**/*.test.{ts,tsx}`
+- Entry: `index.html` → `src/main.tsx`
+- Root component: `src/App.tsx`; routing: `src/route/` (route config, paths, route table)
+- Pages: `src/pages/`
+- Utils: `src/utils/` (shared utility functions)
+- Constants: `src/consts/` (API URLs, enums, etc.; routes live in `src/route/`, not here)
+- Shared components: `src/components/`
+- State: `src/store/` (Zustand)
+- HTTP: `src/api/` or `src/services/` (Axios)
+- Tests: Vitest; test dir `test/` or `src/test/` (setup, fixtures, mocks); unit tests next to source as `src/**/*.test.{ts,tsx}`
+
+**Dev proxy:** In `vite.config.ts`, `server.proxy` forwards API requests (e.g. `/api`) to the backend; default target port **5000** — should match the backend’s actual listen port (confirm and update after the backend is initialized).
 
 ---
 
-## 开发与维护约定
+## Development and maintenance
 
-### 脚本命令
+### Scripts
 
 {{SCRIPTS}}
 
-### 代码与规范
+### Code and conventions
 
-- 使用 TypeScript，遵循项目内已有风格
-- 组件与页面按功能组织在 `src/` 下
-- **功能/页面/组件开发**：优先使用 **frontend-codegen** 技能（若已安装：`Hillstone-Networks/Agent-Skills` 之 `frontend-codegen`），按复用优先、UI/业务分层、数据化路由、测试先行与函数组件规范生成代码
-- 新增能力时同步更新本 AGENTS.md（可追加「Agent 记忆日志」）
+- Use TypeScript and follow existing project style
+- Organize components and pages under `src/` by feature
+- **Feature/page/component work:** Prefer the **frontend-codegen** skill (if installed: `frontend-codegen` from `Hillstone-Networks/Agent-Skills`) for reuse-first, UI/business separation, data-driven routes, test-first, and function components
+- When adding capabilities, update this AGENTS.md (e.g. append to “Agent memory log”)
 
-### 测试与构建
+### Test and build
 
-- 单元/组件测试：`npm run test`（Vitest + jsdom）
-- 生产构建：`npm run build`，产物在 `dist/`
-- 本地预览构建结果：`npm run preview`
+- Unit/component tests: `npm run test` (Vitest + jsdom)
+- Production build: `npm run build`; output in `dist/`
+- Preview build locally: `npm run preview`
 
-### 文档语言
+### Documentation language
 
-- 仓库级文档与 AGENTS.md 默认中文；若团队约定英文则按约定。
+- Repo-level docs and AGENTS.md default to English; use another language if the team agrees.
 
 ---
 
-## Agent 记忆日志
+## Agent memory log
 
-<!-- 在此追加重要决策或发现，格式：- [YYYY-MM-DD] 内容 -->
-<!-- 初始化于 {{INITIALIZED_DATE}} -->
+<!-- Append decisions or findings here, format: - [YYYY-MM-DD] content -->
+<!-- Initialized {{INITIALIZED_DATE}} -->
