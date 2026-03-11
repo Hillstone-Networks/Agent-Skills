@@ -1,0 +1,38 @@
+project/
+├── app/
+│   ├── __init__.py
+│   ├── config.py
+│   ├── extensions.py
+│   ├── routes/
+│   │   ├── __init__.py
+│   │   ├── main_api.py
+│   │   └── {module}_api.py
+│   ├── models/
+│   │   ├── __init__.py
+│   │   └── *.py
+│   ├── service/
+│   │   ├── __init__.py
+│   │   └── *_service.py
+│   ├── schemas/
+│   │   ├── __init__.py
+│   │   └── *_schema.py
+│   ├── permission/
+│   │   ├── constants.py
+│   │   ├── policies.py
+│   │   ├── decorators.py
+│   │   └── manager.py
+│   └── utils/
+│       ├── api_util.py
+│       ├── logger_util.py
+│       └── jwt_util.py
+├── docs/
+├── context/
+├── tests/
+│   ├── conftest.py
+│   ├── test_api.py
+│   └── test_service.py
+├── scripts/
+├── .env.example
+├── pyproject.toml
+├── Dockerfile
+├── README.md

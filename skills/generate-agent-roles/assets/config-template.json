@@ -1,0 +1,21 @@
+{
+  "projectName": "项目或场景名称",
+  "scenario": "system-development | data-analysis | ops-sre | product | fullstack",
+  "version": "1.0",
+  "roles": [],
+  "workflow": {
+    "type": "sequential | parallel | mixed",
+    "stages": [
+      {
+        "name": "阶段名",
+        "roleIds": ["role-id-1", "role-id-2"],
+        "deliverables": ["产出物列表"]
+      }
+    ]
+  },
+  "conventions": {
+    "branchNaming": "feature/<role-id>/<short-desc>",
+    "docFormat": "markdown",
+    "apiFormat": "openapi-3"
+  }
+}

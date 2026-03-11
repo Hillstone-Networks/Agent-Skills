@@ -1,0 +1,75 @@
+# GitLab CI 示例结构（推送至私有镜像仓库 registry.dic.hillstonenet.com）
+# 阶段与 Job 对应关系见 references/REFERENCE.md；私有仓库说明见 REFERENCE「私有镜像仓库」
+# 推送地址：registry.dic.hillstonenet.com；需在 GitLab CI/CD Variables 中配置 REGISTRY_USER、REGISTRY_PASSWORD（设为 Masked）
+# 若未设置 PRIVATE_REGISTRY/IMAGE_NAMESPACE，则使用下方默认值
+# 默认 Runner tags：grunner（所有 Job 使用带该 tag 的 Runner）
+
+default:
+  tags:
+    - grunner
+
+stages:
+  - build
+  - deploy
+
+variables:
+  # 私有镜像仓库：registry.dic.hillstonenet.com，命名空间 private，完整镜像前缀 <registry>/<namespace>/<项目名>
+  PRIVATE_REGISTRY: "registry.dic.hillstonenet.com"
+  IMAGE_NAMESPACE: "private"
+  DOCKER_IMAGE: "${PRIVATE_REGISTRY}/${IMAGE_NAMESPACE}/${CI_PROJECT_NAME}"
+
+# 仅 develop 且依赖文件变更时构建依赖镜像
+build_env:
+  stage: build
+  only:
+    refs: [develop]
+    changes: [Dockerfile, pyproject.toml, uv.lock]
+  before_script:
+    - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin "$PRIVATE_REGISTRY"
+  script:
+    - docker build --target requirement -t $DOCKER_IMAGE:requirement .
+    - docker push $DOCKER_IMAGE:requirement
+
+# 构建应用镜像（develop、bugfix/*）
+build_project:
+  stage: build
+  only:
+    - develop
+    - /^bugfix\/.*/
+  before_script:
+    - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin "$PRIVATE_REGISTRY"
+  script:
+    - docker build --target project -t $DOCKER_IMAGE:latest .
+  # 若需复用 build_env 的 requirement 镜像，可在此处 pull
+
+# 推送到私有镜像仓库
+push_image:
+  stage: deploy
+  only:
+    - develop
+    - /^bugfix\/.*/
+    - /^hotfix\/.*/
+  before_script:
+    - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin "$PRIVATE_REGISTRY"
+  script:
+    - docker tag $DOCKER_IMAGE:latest $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA
+    - docker push $DOCKER_IMAGE:latest
+    - docker push $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA
+
+# 开发环境 K8s 部署（dev → prod 必须使用 K8s）
+dev_deploy:
+  stage: deploy
+  only:
+    - develop
+    - /^bugfix\/.*/
+    - /^hotfix\/.*/
+  script:
+    - ./scripts/dev_deploy.sh   # K8s：context dev、ConfigMap、envsubst 模板、kubectl apply、rollout restart；模板见 assets/k8s/dev_deployment.yaml.tpl
+
+# 生产环境 K8s 部署（仅 master）
+prod_deploy:
+  stage: deploy
+  only:
+    - master
+  script:
+    - ./scripts/prod_deploy.sh  # K8s：context prod，同上流程

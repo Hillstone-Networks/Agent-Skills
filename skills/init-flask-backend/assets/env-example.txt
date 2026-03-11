@@ -1,0 +1,9 @@
+# 复制为 .env 并按环境填写
+FLASK_ENV=development
+SECRET_KEY=
+DATABASE_URL=sqlite:///app.db
+REDIS_URL=redis://localhost:6379/0
+JWT_SECRET_KEY=
+# 可选：生产环境链路
+# TRACE_ENDPOINT=http://localhost:4318/v1/traces
+# DISABLEPATH=  # 逗号分隔要禁用的 *_api.py 文件名

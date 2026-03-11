@@ -1,0 +1,37 @@
+#!/bin/bash
+# Prod 环境 K8s 部署脚本（供 .gitlab-ci.yml 的 prod_deploy Job 调用）
+# 仅 master 分支触发；使用 prod 集群 context；Ingress host 等可与 dev 不同（如 apis.dic.hillstonenet.com）
+
+set -e
+
+echo "${CI_PROJECT_NAME}"
+echo "开始部署生产环境"
+
+# 使用 prod 集群 context
+kubectl config use-context kubernetes-admin-prod@kubernetes
+
+# 保证 .env.example 含 ENV=prod（ConfigMap 用）
+if [[ -f .env.example ]]; then
+  if ! grep -q '^ENV=prod' .env.example; then
+    sed -i '1i ENV=prod' .env.example
+  fi
+fi
+
+# ConfigMap 不存在时从 .env.example 创建
+echo "检查 ConfigMap: ${CI_PROJECT_NAME}-env 是否存在..."
+if ! kubectl get configmap ${CI_PROJECT_NAME}-env -n api-server >/dev/null 2>&1; then
+  echo "ConfigMap 不存在，正在创建..."
+  kubectl create configmap ${CI_PROJECT_NAME}-env --from-env-file=.env.example -n api-server
+else
+  echo "ConfigMap 已存在，跳过创建。"
+fi
+
+# 使用 prod 模板（若与 dev 仅 context/ingress 不同，可复用同一模板并改 context；或使用 prod 专用模板 k8s/prod_deployment.yaml.tpl）
+TEMPLATE="${DEPLOY_TEMPLATE:-./k8s/prod_deployment.yaml.tpl}"
+if [[ ! -f "$TEMPLATE" ]]; then
+  TEMPLATE="./k8s/dev_deployment.yaml.tpl"
+fi
+export CI_PROJECT_NAME
+envsubst < "$TEMPLATE" > deployment.yaml
+kubectl apply -f deployment.yaml
+kubectl rollout restart deployment ${CI_PROJECT_NAME} -n api-server

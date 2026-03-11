@@ -1,0 +1,27 @@
+# 使用 uv 时的 pyproject.toml 示例（生成项目时参考）
+[project]
+name = "my-flask-api"
+version = "0.1.0"
+description = "Flask API backend"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "flask>=3.0",
+    "flask-restful>=0.3.10",
+    "flask-sqlalchemy>=3.1",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+]
+
+[tool.uv]
+# 可选：锁文件、虚拟环境路径等
+# dev-dependencies = ["pytest", "pytest-cov"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

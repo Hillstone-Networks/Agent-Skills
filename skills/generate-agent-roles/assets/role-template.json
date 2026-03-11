@@ -1,0 +1,37 @@
+{
+  "$schema": "Role definition for generate-agent-roles skill",
+  "id": "role-id-kebab-case",
+  "displayName": "角色显示名称",
+  "scenario": "system-development | data-analysis | ops-sre | product | fullstack",
+  "scope": "该角色的职责范围与边界；明确不负责的事项。",
+  "inputExpectation": {
+    "upstreamRoles": ["上游角色 id 列表"],
+    "artifacts": ["期望收到的产出物名称或类型"],
+    "requiredFormat": "文档/接口/配置等格式要求"
+  },
+  "constraints": [
+    "必须遵守的规范 1：如分支命名、提交信息格式",
+    "必须遵守的规范 2：如安全、性能、可访问性"
+  ],
+  "outputSpec": {
+    "artifacts": [
+      {
+        "name": "产出物名称",
+        "format": "markdown | openapi | json-schema | code",
+        "description": "简要说明"
+      }
+    ],
+    "qualityCriteria": ["可验收的质量标准条目"],
+    "templateRef": "可选：引用的模板路径或 id"
+  },
+  "handoff": {
+    "targetRoles": ["下游角色 id 列表"],
+    "format": "document | branch | ticket",
+    "checklist": ["交接前必须完成的检查项"]
+  },
+  "metadata": {
+    "version": "1.0",
+    "tags": [],
+    "owner": ""
+  }
+}

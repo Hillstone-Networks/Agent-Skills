@@ -1,0 +1,38 @@
+#!/bin/bash
+# Dev 环境 K8s 部署脚本（供 .gitlab-ci.yml 的 dev_deploy Job 调用）
+# 前置：Runner 已配置 kubectl 且可访问 dev 集群；CI 中已设置 CI_PROJECT_NAME
+# 模板路径：可由 Runner 固定路径（如 /.flaskserver/dev_deployment.yaml.tpl）或项目内 k8s/dev_deployment.yaml.tpl
+
+set -e
+
+echo "${CI_PROJECT_NAME}"
+echo "开始部署测试环境"
+
+# 使用 dev 集群 context
+kubectl config use-context kubernetes-admin-dev@kubernetes
+
+# 保证 .env.example 含 ENV=dev（ConfigMap 用）
+if [[ -f .env.example ]]; then
+  if ! grep -q '^ENV=dev' .env.example; then
+    sed -i '1i ENV=dev' .env.example
+  fi
+fi
+
+# ConfigMap 不存在时从 .env.example 创建
+echo "检查 ConfigMap: ${CI_PROJECT_NAME}-env 是否存在..."
+if ! kubectl get configmap ${CI_PROJECT_NAME}-env -n api-server >/dev/null 2>&1; then
+  echo "ConfigMap 不存在，正在创建..."
+  kubectl create configmap ${CI_PROJECT_NAME}-env --from-env-file=.env.example -n api-server
+else
+  echo "ConfigMap 已存在，跳过创建。"
+fi
+
+# 模板路径：优先项目内 k8s/，否则可使用 Runner 固定路径（如 /.flaskserver/dev_deployment.yaml.tpl）
+TEMPLATE="${DEPLOY_TEMPLATE:-./k8s/dev_deployment.yaml.tpl}"
+if [[ ! -f "$TEMPLATE" ]]; then
+  TEMPLATE="/.flaskserver/dev_deployment.yaml.tpl"
+fi
+export CI_PROJECT_NAME
+envsubst < "$TEMPLATE" > deployment.yaml
+kubectl apply -f deployment.yaml
+kubectl rollout restart deployment ${CI_PROJECT_NAME} -n api-server

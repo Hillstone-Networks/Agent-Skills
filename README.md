@@ -49,6 +49,10 @@ npx skills add Hillstone-Networks/Agent-Skills -a cursor -y
 | **init-react-frontend** | 初始化 React 前端项目：默认技术栈为 React + Ant Design + react-router + TypeScript + Zustand + Vitest + jsdom + Tailwind CSS + Axios + Vite + Rolldown，依赖采用生成时最新版本，并生成适配该项目的 AGENTS.md。 |
 | **frontend-codegen** | 前端代码生成：在既有 React 项目中按规范生成功能/页面/组件；复用优先（工具与组件）、UI 与业务分层、数据化路由、测试先行（红/绿）、函数组件；新增第三方库时提供 3 选方案供确认。 |
 | **init-taro-miniapp** | 初始化 Taro 小程序项目：使用最新版 Taro CLI（`taro init` / `npx @tarojs/cli init`）与 @tarojs/components，生成带代码生成约束的 AGENTS.md（复用优先、风格统一、第三方库多方案、UI/业务分离）。 |
+| **backend-api-cicd** | GitLab CI + Docker 流水线：根据 GitLab CI 与 Docker 多阶段构建规范，生成或校验 `.gitlab-ci.yml`、分支约定与部署脚本；强调先本地 Docker 构建测试、再通过 Git 提交触发流水线；支持 dev → prod 的 K8s 部署（dev_deploy / prod_deploy）、私有镜像仓库与分支策略说明。 |
+| **flask-backend-codegen** | Flask 后端代码生成：按项目规范生成 Flask API 代码（路由 Resource、Service、Model、Schema、权限策略与测试）；在用户要新增接口、新资源模块或按规范生成/补全后端代码时使用；遵循 RequestParser、AppResponse、分页与权限约定。 |
+| **generate-agent-roles** | 生成 Agent 角色定义：根据用户使用场景规划并生成多角色 Agent 定义；执行前先查询当前可用技能并询问用户限制或规定；包含角色划分、各角色使用要求与输出规范；适用于创建 agent 角色、定义多智能体团队、规划系统开发/数据分析/运维等场景。 |
+| **init-flask-backend** | 初始化 Flask 后端项目：按分层架构与规范搭建 Flask API 后端，包含应用工厂、Blueprint/Flask-RESTful 路由、Service/Model 分层、权限（JWT + Casbin）与统一响应；在用户要创建或生成 Flask 后端、REST API 项目时使用；支持 uv 依赖管理。 |
 
 ## 支持的 Agent
 
@@ -74,10 +78,25 @@ Agent-Skills/
     │       └── AGENTS.template.md  # 生成项目用 AGENTS.md 模板
     ├── frontend-codegen/
     │   └── SKILL.md    # 前端代码生成规范（复用、分层、路由、测试先行）
-    └── init-taro-miniapp/
-        ├── SKILL.md    # 技能定义与说明
-        └── assets/templates/
-            └── AGENTS.template.md  # 生成项目用 AGENTS.md 模板
+    ├── init-taro-miniapp/
+    │   ├── SKILL.md    # 技能定义与说明
+    │   └── assets/templates/
+    │       └── AGENTS.template.md  # 生成项目用 AGENTS.md 模板
+    ├── backend-api-cicd/
+    │   ├── SKILL.md    # GitLab CI + Docker 多阶段构建与 K8s 部署
+    │   ├── references/ # 分支/阶段/Job 约定与私有仓库说明
+    │   └── assets/     # .gitlab-ci 示例、Docker 构建命令、K8s 模板与部署脚本
+    ├── flask-backend-codegen/
+    │   ├── SKILL.md    # Flask API 代码生成（路由、Service、Model、Schema、权限、测试）
+    │   └── references/ # 接口与代码规范
+    ├── generate-agent-roles/
+    │   ├── SKILL.md    # 多角色 Agent 定义生成（场景→角色、约束、产出规范）
+    │   ├── assets/     # 角色模板、场景示例、校验脚本
+    │   └── references/
+    └── init-flask-backend/
+        ├── SKILL.md    # Flask 后端项目脚手架（应用工厂、分层、权限、统一响应）
+        ├── references/ # 目录结构与规范
+        └── assets/     # 项目结构、create_app 片段、uv 使用说明
 ```
 
 ## 相关链接

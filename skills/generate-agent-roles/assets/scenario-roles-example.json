@@ -1,0 +1,51 @@
+{
+  "scenario": "system-development",
+  "displayName": "系统开发",
+  "description": "典型软件/产品研发场景下的角色划分与产出",
+  "roles": [
+    {
+      "id": "product-analyst",
+      "displayName": "产品需求分析师",
+      "scope": "需求澄清、PRD、用户故事与验收标准；不负责技术方案与实现细节。",
+      "outputs": ["PRD", "用户故事", "验收清单", "原型说明"]
+    },
+    {
+      "id": "architect",
+      "displayName": "架构设计师",
+      "scope": "技术选型、模块划分、接口与数据模型设计；不负责具体编码与部署脚本。",
+      "outputs": ["架构图", "技术方案", "API 契约", "数据模型"]
+    },
+    {
+      "id": "backend-engineer",
+      "displayName": "后端开发工程师",
+      "scope": "接口实现、领域逻辑、数据持久化与外部集成；不负责前端与运维流水线。",
+      "outputs": ["代码", "API 文档", "数据模型说明", "迁移脚本"]
+    },
+    {
+      "id": "frontend-engineer",
+      "displayName": "前端开发工程师",
+      "scope": "页面与交互、状态与联调、性能与可访问性；不负责后端接口实现与部署。",
+      "outputs": ["页面/组件", "交互说明", "联调清单"]
+    },
+    {
+      "id": "qa-engineer",
+      "displayName": "测试工程师",
+      "scope": "用例设计、自动化与回归、缺陷跟踪；不负责需求与架构决策。",
+      "outputs": ["测试用例", "测试报告", "缺陷列表"]
+    },
+    {
+      "id": "devops-engineer",
+      "displayName": "运维/DevOps 工程师",
+      "scope": "部署、CI/CD、监控与发布流程；不负责业务逻辑与产品需求。",
+      "outputs": ["部署文档", "流水线配置", "运维手册"]
+    }
+  ],
+  "dependencyOrder": [
+    "product-analyst",
+    "architect",
+    "backend-engineer",
+    "frontend-engineer",
+    "qa-engineer",
+    "devops-engineer"
+  ]
+}
