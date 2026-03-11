@@ -41,7 +41,9 @@
 
 ## Docker 多阶段构建
 
-- **Python 基础镜像（默认）**：Python 项目 Dockerfile 的 `FROM` 默认使用 **docker.dic.hillstonenet.com/library/python:3.12-slim**，作为 requirement 与 project 阶段的基镜像，保证构建与运行环境一致且走私有镜像源。
+- **依赖文件检查（必须）**：生成或校验 Dockerfile **之前**须确认项目根目录已存在依赖文件；否则 `uv sync` / `pip install` 会失败。使用 uv 时须有 `pyproject.toml` 与 `uv.lock`（缺一则 uv 安装不了）；使用 pip 时须有 `requirements.txt`。缺文件时应先提示用户创建（如 `uv init`、`uv lock`），再生成 Dockerfile。详见 [assets/dockerfile-python-base.md](../assets/dockerfile-python-base.md)「前置：检查项目依赖文件」。
+- **私有镜像源参考（必须，尤其 Python）**：生成或校验 Dockerfile 时**必须**参考 [assets/dockerfile-python-base.md](../assets/dockerfile-python-base.md)。Python 基础镜像与 pip/uv 安装源均须按该文档配置。
+- **Python 基础镜像（默认）**：Python 项目 Dockerfile 的 `FROM` **必须**使用 **docker.dic.hillstonenet.com/library/python:3.12-slim**，作为 requirement 与 project 阶段的基镜像，保证构建与运行环境一致且走私有镜像源；pip/uv 安装依赖须使用该文档规定的镜像源，禁止不指定源的 `pip install`。
 | 阶段名     | 用途 | CI 使用 |
 |------------|------|---------|
 | requirement | 基于上述 Python 镜像安装 uv，复制 pyproject.toml、uv.lock，uv sync | build_env 使用 --target requirement 构建并推送依赖镜像 |

@@ -1,11 +1,11 @@
 ---
 name: backend-python-cicd
-description: 根据 GitLab CI 与 Docker 多阶段构建规范，生成或校验 .gitlab-ci.yml、分支约定与部署脚本；强调先本地 Docker 构建测试、再 Git 提交触发流水线；文档中的 Docker 与 Git 命令均可直接执行。在用户要配置 GitLab CI、Docker 流水线、分支策略或部署流程时使用。
+description: 根据 GitLab CI 与 Docker 多阶段构建规范，生成或校验 .gitlab-ci.yml、分支约定与部署脚本；强调先本地 Docker 构建测试、再 Git 提交触发流水线；必须使用私有镜像源参考（尤其 Python 基础镜像与 pip/uv 源）。文档中的 Docker 与 Git 命令均可直接执行。在用户要配置 GitLab CI、Docker 流水线、分支策略或部署流程时使用。
 ---
 
 # GitLab CI + Docker 流水线
 
-按「build → deploy」两阶段、分支触发规则与 Docker 多阶段构建，生成或维护 `.gitlab-ci.yml`、分支使用说明及部署脚本。**部署方式固定为 dev → prod，且必须使用 Kubernetes（K8s）部署**。**文档与说明中的 Docker 命令、Git 命令均为可直接执行的命令**：用户或 Agent 可将这些命令复制到终端直接运行，无需改写。；在 `.gitlab-ci.yml` 中通过 dev_deploy / prod_deploy 调用 K8s 部署脚本，使用模板（如 `dev_deployment.yaml.tpl`）经 `envsubst` 替换后 `kubectl apply`。详细约定见 [references/REFERENCE.md](references/REFERENCE.md)。
+按「build → deploy」两阶段、分支触发规则与 Docker 多阶段构建，生成或维护 `.gitlab-ci.yml`、分支使用说明及部署脚本。**部署方式固定为 dev → prod，且必须使用 Kubernetes（K8s）部署**。**生成或校验时必须遵循私有镜像源参考**，尤其是 **Python 相关**：Docker 基础镜像使用 `docker.dic.hillstonenet.com/library/python:*`，pip/uv 安装依赖须使用约定镜像源（详见 [assets/dockerfile-python-base.md](assets/dockerfile-python-base.md)）。**文档与说明中的 Docker 命令、Git 命令均为可直接执行的命令**：用户或 Agent 可将这些命令复制到终端直接运行，无需改写。在 `.gitlab-ci.yml` 中通过 dev_deploy / prod_deploy 调用 K8s 部署脚本，使用模板（如 `dev_deployment.yaml.tpl`）经 `envsubst` 替换后 `kubectl apply`。详细约定见 [references/REFERENCE.md](references/REFERENCE.md)。
 
 ## 何时使用
 
@@ -42,6 +42,7 @@ description: 根据 GitLab CI 与 Docker 多阶段构建规范，生成或校验
 - **分支策略**：develop / bugfix / hotfix / master 的用途与触发规则
 - **部署目标**：**必须为 dev → prod 两环境，且必须使用 K8s 部署**。开发环境由 dev_deploy 执行（develop/bugfix/hotfix 触发），生产环境由 prod_deploy 执行（仅 master 触发）；脚本名为 `dev_deploy.sh`、`prod_deploy.sh`，在 `.gitlab-ci.yml` 的 deploy 阶段调用；命名空间（如 `api-server`）、ConfigMap（`${CI_PROJECT_NAME}-env`）、imagePullSecrets（`docker-registry`）、部署模板（如 `dev_deployment.yaml.tpl`）见 [assets/k8s/dev_deployment.yaml.tpl](assets/k8s/dev_deployment.yaml.tpl) 与 [assets/scripts/dev_deploy.sh.example](assets/scripts/dev_deploy.sh.example)。
 - **私有镜像仓库**：推送地址默认为 **registry.dic.hillstonenet.com**，命名空间为 **private**（完整镜像如 `registry.dic.hillstonenet.com/private/<项目名>:latest`）；若用户无特别说明，生成 .gitlab-ci.yml 与文档时使用该地址；需明确 CI 内登录方式（变量/凭证）、部署机拉取前是否需 `docker login`
+- **私有镜像源参考（尤其 Python）**：生成 Dockerfile 与 CI 时**必须**参考私有镜像源约定，**Python 项目**须使用 `docker.dic.hillstonenet.com/library/python:3.12-slim` 作为基础镜像，pip/uv 安装依赖须使用 [assets/dockerfile-python-base.md](assets/dockerfile-python-base.md) 中规定的镜像源（禁止仅写 `pip install` 不指定源）。
 - **依赖管理**：是否使用 uv + pyproject.toml + uv.lock；依赖变更时是否单独构建「依赖镜像」以加速后续构建
 
 ### 2. 流水线设计要点
@@ -60,8 +61,13 @@ description: 根据 GitLab CI 与 Docker 多阶段构建规范，生成或校验
 
 若采用「依赖与代码分离」：
 
-- **Python 基础镜像**：Python 项目的 Dockerfile 默认使用私有镜像源中的基础镜像 **docker.dic.hillstonenet.com/library/python:3.12-slim**（即 `FROM docker.dic.hillstonenet.com/library/python:3.12-slim`），以保证构建与运行环境一致且不依赖公网。
-- **requirement 阶段**：在上述基础镜像上安装 uv，复制 `pyproject.toml`、`uv.lock` 并 `uv sync`；产出仅含依赖的中间镜像。CI 中 build_env 使用 `--target requirement` 构建并推送该镜像。
+- **依赖文件检查（必须）**：生成或校验 Dockerfile **之前**必须检查项目根目录是否存在对应依赖文件，否则构建会失败：
+  - **使用 uv 时**：必须存在 `pyproject.toml` 与 `uv.lock`；缺一则 `uv sync` 无法执行，Docker 构建会报错。
+  - **使用 pip 时**：必须存在 `requirements.txt`（或 Dockerfile 中声明的其它依赖文件）。
+  - 若依赖文件不存在，应**先提示用户创建**（如 `uv init`、`uv lock` 或生成 `requirements.txt`），再生成 Dockerfile；或在文档中明确列出「前置：项目须已具备 pyproject.toml + uv.lock（或 requirements.txt）」。
+- **私有镜像源参考（必须）**：生成或校验 Dockerfile 时**必须**遵循 [assets/dockerfile-python-base.md](assets/dockerfile-python-base.md)。**尤其是 Python**：基础镜像与 pip/uv 源均须按该文档配置，不得使用公网默认镜像或未指定源的 pip/uv 安装。
+- **Python 基础镜像**：Python 项目的 Dockerfile **必须**使用私有镜像源中的基础镜像 **docker.dic.hillstonenet.com/library/python:3.12-slim**（即 `FROM docker.dic.hillstonenet.com/library/python:3.12-slim`），以保证构建与运行环境一致且不依赖公网；其他版本仍使用同前缀 `docker.dic.hillstonenet.com/library/python:*`。
+- **requirement 阶段**：在上述基础镜像上复制并安装依赖；**使用 uv 时**须复制 `pyproject.toml`、`uv.lock` 再执行 `uv sync`（两文件缺一不可）；**uv/pip 须按 dockerfile-python-base.md 配置镜像源**。产出仅含依赖的中间镜像。CI 中 build_env 使用 `--target requirement` 构建并推送该镜像。
 - **project 阶段**：在 requirement 基础上复制应用代码、设置启动命令；产出可运行的应用镜像。build_project 使用 `--target project` 构建。
 
 本地等价命令示例见 [assets/docker-build-commands.md](assets/docker-build-commands.md)。
@@ -93,7 +99,7 @@ description: 根据 GitLab CI 与 Docker 多阶段构建规范，生成或校验
 按需生成或更新：
 
 1. **.gitlab-ci.yml**：阶段、Job、only/except 或 rules（changes/refs）、依赖关系；**默认 Runner tags** 为 `grunner`（`default.tags: [grunner]`），保证所有 Job 在指定 Runner 上执行。
-2. **Dockerfile**：多阶段 target（requirement、project）、与 CI Job 的对应；Python 项目基础镜像默认 **docker.dic.hillstonenet.com/library/python:3.12-slim**。
+2. **Dockerfile**：多阶段 target（requirement、project）、与 CI Job 的对应；**生成前必须检查项目依赖文件**（uv 项目须有 `pyproject.toml`、`uv.lock`，pip 项目须有 `requirements.txt`），缺则构建失败；**必须遵循私有镜像源参考**，Python 项目基础镜像**必须**为 **docker.dic.hillstonenet.com/library/python:3.12-slim**，pip/uv 安装须按 [assets/dockerfile-python-base.md](assets/dockerfile-python-base.md) 配置镜像源。
 3. **分支与流水线说明文档**：**强调先本地 Docker 构建测试、再 Git 推送触发流水线**；说明 (1) **先**本地 Docker 构建测试方式（含**可直接执行的 Docker 命令**与验证通过后再推送的提示），(2) **再**通过 Git 提交触发流水线（推送后自动触发）、(3) 使用流水线前需配置 **git.tac.hillstonenet.com** 远程仓库（若无则提示创建/关联）；阶段/Job 表、分支约定表；**Docker 命令与 Git 命令均设计为可直接在终端执行**（各场景为可复制执行的命令块或可执行脚本，仓库地址 git.tac.hillstonenet.com），见 [assets/git-operations.md](assets/git-operations.md)。可参考项目内 `docs/GITLAB-CICD.md` 类文档结构。
 4. **部署脚本与 K8s 模板**：**必须**提供 dev → prod 的 K8s 部署方式。`scripts/dev_deploy.sh`、`scripts/prod_deploy.sh` 参考 [assets/scripts/dev_deploy.sh.example](assets/scripts/dev_deploy.sh.example)、[assets/scripts/prod_deploy.sh.example](assets/scripts/prod_deploy.sh.example)（kubectl context 切换、ConfigMap 检查/创建、envsubst + 模板生成 manifest、kubectl apply、rollout restart）；项目内需提供 `k8s/dev_deployment.yaml.tpl`（及可选 `k8s/prod_deployment.yaml.tpl`），内容参考 [assets/k8s/dev_deployment.yaml.tpl](assets/k8s/dev_deployment.yaml.tpl)（Deployment + Service + Ingress，变量 `${CI_PROJECT_NAME}`，镜像 `docker.dic.hillstonenet.com/private/${CI_PROJECT_NAME}:latest`，命名空间 `api-server`）。模板路径在 Runner 上可为固定路径（如 `/.flaskserver/dev_deployment.yaml.tpl`）或使用项目内 `k8s/`。
 5. **流水线完成后使用说明**：说明 dev 与 prod 均为 K8s 部署；访问地址（dev 如 `https://<项目名>.apistest.dic.hillstonenet.com`）、ConfigMap/环境变量、常用 kubectl 命令。详见 [assets/k8s/k8s-deploy-usage.md](assets/k8s/k8s-deploy-usage.md)。
@@ -102,9 +108,10 @@ description: 根据 GitLab CI 与 Docker 多阶段构建规范，生成或校验
 
 - 阶段/Job 与分支对应：[references/REFERENCE.md](references/REFERENCE.md)、[assets/pipeline-overview.md](assets/pipeline-overview.md)
 - **私有镜像仓库**（CI 登录、镜像命名、部署侧拉取）：[references/REFERENCE.md](references/REFERENCE.md) 中「私有镜像仓库」小节
+- **私有镜像源参考（必读，尤其 Python）**：[assets/dockerfile-python-base.md](assets/dockerfile-python-base.md) — Docker 基础镜像须用 `docker.dic.hillstonenet.com/library/python:3.12-slim`，pip/uv 安装依赖须配置约定镜像源，禁止不指定源的 `pip install`。
 - .gitlab-ci.yml 示例结构（含私有仓库登录）：[assets/gitlab-ci-example.yml](assets/gitlab-ci-example.yml)
 - 本地 Docker 多阶段构建命令：[assets/docker-build-commands.md](assets/docker-build-commands.md)
-- **Python 基础镜像**（默认 FROM）：[assets/dockerfile-python-base.md](assets/dockerfile-python-base.md)（docker.dic.hillstonenet.com/library/python:3.12-slim）
+- **Python 基础镜像与 pip/uv 源**（必须遵循）：[assets/dockerfile-python-base.md](assets/dockerfile-python-base.md)（FROM docker.dic.hillstonenet.com/library/python:3.12-slim；pip 镜像源约定见同文件）
 - **K8s 部署（dev → prod，必须）**：Dev 模板 [assets/k8s/dev_deployment.yaml.tpl](assets/k8s/dev_deployment.yaml.tpl)（Deployment + Service + Ingress，`${CI_PROJECT_NAME}`、命名空间 api-server、镜像 docker.dic.hillstonenet.com/private/${CI_PROJECT_NAME}:latest、ConfigMap ${CI_PROJECT_NAME}-env、Ingress host ${CI_PROJECT_NAME}.apistest.dic.hillstonenet.com）；部署脚本示例 [assets/scripts/dev_deploy.sh.example](assets/scripts/dev_deploy.sh.example)、[assets/scripts/prod_deploy.sh.example](assets/scripts/prod_deploy.sh.example)（context 切换、ConfigMap、envsubst、kubectl apply、rollout restart）；使用说明 [assets/k8s/k8s-deploy-usage.md](assets/k8s/k8s-deploy-usage.md)。可选通用模板 [assets/k8s/deployment-template.yaml](assets/k8s/deployment-template.yaml)、[scripts/k8s-deploy.sh](scripts/k8s-deploy.sh)。
 - **Git 操作说明**（详细、可直接执行，仓库 git.tac.hillstonenet.com）：[assets/git-operations.md](assets/git-operations.md)（检查/配置远程、克隆、develop/bugfix/hotfix/master 各场景命令块；Docker 与 Git 命令均可复制到终端直接运行）
 - 若项目内已有「Git 使用说明」或 AGENTS.md，生成的分支与部署说明应与之一致
