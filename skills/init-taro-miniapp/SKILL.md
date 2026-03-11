@@ -1,154 +1,155 @@
 ---
 name: init-taro-miniapp
-description: "Scaffolds a Taro mini-program project using the latest Taro CLI (taro init / npx @tarojs/cli init), standard component library @tarojs/components per Taro docs, and generates project-specific AGENTS.md with code-gen rules (reuse-first, unified style, third-party options, UI/business separation). Use when initializing a mini-program, Taro project, or multi-end (weapp/h5/rn) app."
+description: "Scaffolds a Taro mini-program project using npx @tarojs/cli init <projectName> (e.g. npx @tarojs/cli init myApp), standard component library @tarojs/components per Taro docs, and generates project-specific AGENTS.md with code-gen rules (reuse-first, unified style, third-party options, UI/business separation). Use when initializing a mini-program, Taro project, or multi-end (weapp/h5/rn) app."
 ---
 
-# Init Taro 小程序
+# Init Taro Mini-Program
 
-使用最新版 Taro 初始化跨端小程序项目，采用官方组件库规范，并生成带代码生成约束的 AGENTS.md。
+Scaffold a cross-platform mini-program with the latest Taro, follow the official component library conventions, and generate an AGENTS.md with code-generation constraints.
 
-## 参考文档
+## Reference Docs
 
-- [Taro 介绍与安装](https://docs.taro.zone/docs/)
-- [安装及使用](https://docs.taro.zone/docs/GETTING-STARTED)
-- [组件库说明](https://docs.taro.zone/docs/components-desc) — 使用 `@tarojs/components`，事件以 `on` 开头、组件首字母大写与驼峰命名
+- [Taro Introduction & Installation](https://docs.taro.zone/docs/)
+- [Installation & Usage](https://docs.taro.zone/docs/GETTING-STARTED)
+- [Component Library](https://docs.taro.zone/docs/components-desc) — Use `@tarojs/components`; event props start with `on`, component names are PascalCase.
 
-## 默认技术栈（未指定时）
+## Default Tech Stack (when unspecified)
 
-| 类别     | 默认选择                          |
-|----------|-----------------------------------|
-| 框架     | Taro（最新稳定版）                |
-| 语法     | React 或 Vue3（init 时可选）     |
-| 语言     | TypeScript                       |
-| 组件库   | @tarojs/components（Taro 标准）  |
-| UI 增强  | 可选 taro-ui@next（Taro 3+）     |
+| Category   | Default choice                          |
+|------------|-----------------------------------------|
+| Framework  | Taro (latest stable)                    |
+| Syntax     | React or Vue3 (selectable during init)  |
+| Language   | TypeScript                              |
+| Components | @tarojs/components (Taro standard)      |
+| UI extras  | Optional taro-ui@next (Taro 3+)         |
 
-用户若指定其他框架（如 Vue3、Preact），按用户选择；未指定则可用 React + TypeScript 作为默认。
+If the user specifies another framework (e.g. Vue3, Preact), use that; otherwise React + TypeScript is the default.
 
-## 依赖版本策略
+## Dependency Version Strategy
 
-- Taro 使用最新版本的tarojs 初始化项目。
-- 生成前可查询：`npm info @tarojs/cli version`、`npm info @tarojs/taro version` 等。
-- 在 `package.json` 中写入确定版本（可含 `^`，便于后续升级），并在 README 或 AGENTS.md 中说明版本为脚手架生成时选定。
+- Use the latest Taro versions when initializing the project.
+- Before generating, you may check: `npm info @tarojs/cli version`, `npm info @tarojs/taro version`, etc.
+- Write pinned versions in `package.json` (e.g. with `^` for upgrades) and note in README or AGENTS.md that versions were chosen at scaffold time.
 
-## 工作流
+## Workflow
 
-### 1. 收集项目信息
+### 1. Gather project info
 
-- **项目名称与一句话描述** — 用于 README、AGENTS.md。
-- **框架与语法** — React / Vue3 / Preact 等，是否 TypeScript。
-- **目标端** — 微信小程序、H5、多端等（影响后续脚本与配置）。
-- **文档语言** — 默认中文。
+- **Project name and short description** — For README and AGENTS.md.
+- **Framework and syntax** — React / Vue3 / Preact, and whether to use TypeScript.
+- **Target platforms** — WeChat mini-program, H5, multi-end, etc. (affects scripts and config).
+- **Doc language** — Default is English (or match project preference).
 
-### 2. 使用最新 Taro 初始化项目
+### 2. Initialize with latest Taro
 
-在目标目录执行（二选一）：
-
-```bash
-# 已全局安装 @tarojs/cli 时
-taro init <projectName>
-```
+From the target directory, run (use npx so the latest CLI is used):
 
 ```bash
-# 不全局安装，使用 npx（推荐，保证最新）
 npx @tarojs/cli init <projectName>
 ```
 
-- 初始化过程中按需选择：框架（React/Vue3 等）、TypeScript、CSS 预处理器、编译工具、包管理器。
-- 若在已有目录内初始化，可使用当前目录名作为项目名或先创建子目录再 init。
+Example when the project name is `myApp`:
 
-### 3. 创建常见业务目录
+```bash
+npx @tarojs/cli init myApp
+```
 
-在项目 **src** 下创建常用目录，便于后续按职责放置代码（若 Taro 已生成部分目录则保留并补充）：
+- During init, choose as needed: framework (React/Vue3 etc.), TypeScript, CSS preprocessor, bundler, package manager.
+- If initializing inside an existing directory, use the current directory name as the project name or create a subdirectory first, then run init.
+- If `@tarojs/cli` is installed globally, `taro init <projectName>` is also valid, but prefer the npx form above.
 
-- **apis** — 接口封装、请求方法
-- **utils** — 工具函数
-- **components** — 通用/业务组件
-- **consts** — 常量、枚举、配置项
-- 可选：**hooks**（React 时）、**services**（业务服务层）
+### 3. Create common business directories
 
-可根据项目需要增加其他目录（如 `types`、`stores` 等）。在 AGENTS.md 的 `{{DIR_STRUCTURE}}` 中体现这些目录。
+Under the project **src**, add directories for organizing code by responsibility (keep or extend any that Taro already created):
 
-### 4. 安装依赖
+- **apis** — API wrappers and request helpers
+- **utils** — Utilities
+- **components** — Shared and feature components
+- **consts** — Constants, enums, config
+- Optional: **hooks** (for React), **services** (business services)
 
-初始化与目录创建完成后，在**项目根目录**执行：
+Add others as needed (e.g. `types`, `stores`) and reflect them in AGENTS.md’s `{{DIR_STRUCTURE}}`.
+
+### 4. Install dependencies
+
+After init and directory setup, from the **project root** run:
 
 ```bash
 npm install
 ```
 
-（若初始化时选择了 pnpm/yarn，则使用对应命令。）确保依赖安装完整后再进行代理配置与脚本验证。
+(Use pnpm or yarn if that was chosen during init.) Ensure dependencies are installed before configuring proxy and running scripts.
 
-### 5. 配置后端调试反向代理
+### 5. Configure dev proxy for backend
 
-根据后端服务地址，在项目配置中增加开发环境反向代理，便于本地联调、避免跨域。默认假设后端运行在 **5000** 端口。
+Add a dev proxy in the project config so the frontend can talk to the backend during local development and avoid CORS. By default assume the backend runs on port **5000**.
 
-- 配置文件：Taro 项目一般为 `config/index.js`（或 `config/dev.js`，以实际结构为准）。
-- 在 **h5** 的 **devServer** 下配置 **proxy**，将 `/api`（或约定的前缀）代理到后端，例如：
+- Config file: usually `config/index.js` (or `config/dev.js`, depending on the project).
+- Under **h5** → **devServer**, add **proxy** to forward `/api` (or your chosen prefix) to the backend, e.g.:
 
 ```javascript
 h5: {
   devServer: {
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',  // 默认 5000，可根据后端实际端口修改
+        target: 'http://localhost:5000',  // default 5000; change to backend port if different
         changeOrigin: true,
-        pathRewrite: { '^/api': '/api' }  // 按后端路由调整
+        pathRewrite: { '^/api': '/api' }  // adjust to match backend routes
       }
     }
   }
 }
 ```
 
-- 若后端端口不是 5000，将 `target` 改为 `http://localhost:<后端端口>`；若后端有路径前缀，相应调整 `pathRewrite`。
-- 小程序端无 devServer，需在「微信开发者工具 → 详情 → 本地设置」中勾选「不校验合法域名」进行真机/模拟器调试，或配置合法 request 域名；H5 开发时通过上述 proxy 访问后端即可。
+- If the backend port is not 5000, set `target` to `http://localhost:<port>`. If the backend has a path prefix, adjust `pathRewrite` accordingly.
+- Mini-program targets have no devServer; in WeChat DevTools → Details → Local settings, enable “Do not verify legal domain” for device/simulator debugging, or configure valid request domains. For H5, use the proxy above to reach the backend.
 
-在 AGENTS.md 或 README 中注明：本地 H5 开发时代理前缀（如 `/api`）与后端端口（默认 5000），方便后续维护。
+Document in AGENTS.md or README: the proxy prefix (e.g. `/api`) and backend port (default 5000) for local H5 development.
 
-### 6. 组件库规范（@tarojs/components）
+### 6. Component library (@tarojs/components)
 
-- 组件以 [Taro 组件库说明](https://docs.taro.zone/docs/components-desc) 为准，从 `@tarojs/components` 引用。
-- React 示例：
+- Follow the [Taro component docs](https://docs.taro.zone/docs/components-desc); import from `@tarojs/components`.
+- React example:
 
 ```tsx
 import { View, Text } from '@tarojs/components'
 ```
 
-- 规范要点：
-  - 组件名**首字母大写、驼峰**（如 `Map`、`View`）。
-  - 事件属性以 **on 开头**（如 `onClick`、`onTap`），与小程序 bind 写法对应。
-- 可选：多端 UI 组件库 [Taro UI](https://taro-ui.jd.com/)（Taro 3+ 使用 `taro-ui@next`）。
+- Conventions:
+  - Component names **PascalCase** (e.g. `Map`, `View`).
+  - Event props start with **on** (e.g. `onClick`, `onTap`), matching mini-program `bind` usage.
+- Optional: [Taro UI](https://taro-ui.jd.com/) for multi-end UI (Taro 3+ use `taro-ui@next`).
 
-### 7. 生成 AGENTS.md
+### 7. Generate AGENTS.md
 
-在**已初始化的项目根目录**生成 `AGENTS.md`，使用本技能自带的 `assets/templates/AGENTS.template.md` 填充。
+In the **initialized project root**, generate `AGENTS.md` from this skill’s `assets/templates/AGENTS.template.md`.
 
-**占位符：**
+**Placeholders:**
 
-- `{{PROJECT_NAME}}` — 项目名称
-- `{{PROJECT_DESCRIPTION}}` — 一句话描述
-- `{{TECH_STACK_TABLE}}` — 技术栈表（Taro、React/Vue、TS、@tarojs/components 等）
-- `{{DIR_STRUCTURE}}` — 项目目录树（含 `src/` 下 apis、utils、components、consts 等，以及 `config/`、`dist/`）
-- `{{SCRIPTS}}` — 常用脚本（如 `dev:weapp`、`build:weapp`、`dev:h5`、`build:h5` 等）及说明
-- `{{INITIALIZED_DATE}}` — 初始化日期 `YYYY-MM-DD`
+- `{{PROJECT_NAME}}` — Project name
+- `{{PROJECT_DESCRIPTION}}` — Short description
+- `{{TECH_STACK_TABLE}}` — Tech stack table (Taro, React/Vue, TS, @tarojs/components, etc.)
+- `{{DIR_STRUCTURE}}` — Directory tree (including `src/` with apis, utils, components, consts, and `config/`, `dist/`)
+- `{{SCRIPTS}}` — Common scripts (e.g. `dev:weapp`, `build:weapp`, `dev:h5`, `build:h5`) and their purpose
+- `{{INITIALIZED_DATE}}` — Init date in `YYYY-MM-DD`
 
-文档语言与项目约定一致（默认中文）。
+Use the project’s chosen doc language (default English).
 
-### 8. 代码生成约束（写入 AGENTS.md）
+### 8. Code-generation rules (in AGENTS.md)
 
-生成的 AGENTS.md 中必须包含以下约定（模板已含，确保填充后保留）：
+The generated AGENTS.md must include these rules (the template already has them; keep them after filling):
 
-- **a. 优先复用已有逻辑** — 新增前先查找 `utils`、`components`、`hooks`、`api`，能复用则复用或扩展，不重复造轮子。
-- **b. 代码风格统一** — 遵循项目内已有风格（命名、缩进、引号、组件写法等）。
-- **c. 新增第三方库** — 须给出多个方案（至少 2–3 个），列出优缺点，由用户选择后再安装并记录。
-- **d. UI 与业务组件分离** — 展示/交互组件与数据、接口、状态逻辑分层；容器/页面负责业务，纯 UI 组件只接收 props 与回调。
+- **a. Reuse first** — Before adding code, look in `utils`, `components`, `hooks`, `api`; reuse or extend instead of duplicating.
+- **b. Consistent style** — Follow existing project style (naming, indentation, quotes, component patterns).
+- **c. New third-party libs** — Propose at least 2–3 options with pros/cons; install and document only after the user chooses.
+- **d. Separate UI and business** — Split presentational/interactive components from data, APIs, and state; containers/pages own business logic; pure UI components only receive props and callbacks.
 
-### 9. 后续步骤
+### 9. Next steps
 
-- 依赖已在步骤 4 安装；可选再次执行 `npm install` 以确认依赖完整。
-- 可选：运行 `npm run dev:weapp`（或 `dev:h5` 等对应端）并在开发者工具中打开 `dist` 验证；H5 开发时可确认代理是否生效。
-- 告知用户项目已就绪、AGENTS.md 位置、目录约定（apis/utils/components/consts 等）及后端代理配置（默认 5000 端口）。
+- Dependencies are installed in step 4; optionally run `npm install` again to confirm.
+- Optional: run `npm run dev:weapp` (or `dev:h5` for the target platform) and open `dist` in the dev tools; for H5, verify the proxy works.
+- Tell the user the project is ready, where AGENTS.md is, the directory conventions (apis, utils, components, consts, etc.), and the backend proxy (default port 5000).
 
-## 模板路径
+## Template paths
 
-- **AGENTS 模板：** `assets/templates/AGENTS.template.md` — 按上述占位符填入新项目名称、技术栈、目录结构、脚本及日期。
+- **AGENTS template:** `assets/templates/AGENTS.template.md` — Fill with the placeholders above (project name, tech stack, dir structure, scripts, date).
