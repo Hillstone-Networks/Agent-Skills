@@ -18,7 +18,7 @@
 
 ## Git 操作说明（详细、可自动执行）
 
-各分支场景的 Git 操作需以**可直接复制执行的命令块**或**可执行脚本**形式提供，便于用户或脚本自动执行。详见 [assets/git-operations.md](../assets/git-operations.md)，包含：检查/配置远程、克隆、日常 develop 提交、bugfix 创建/推送/合并回 develop、hotfix 创建/推送/合并回 master 与 develop、develop 合并到 master 发布生产；每段为完整命令序列，复制即用。
+各分支场景的 Git 操作需以**可直接复制执行的命令块**或**可执行脚本**形式提供，便于用户或脚本自动执行。详见本技能 `assets/backend-python-cicd/git-operations.md`，包含：检查/配置远程、克隆、日常 develop 提交、bugfix 创建/推送/合并回 develop、hotfix 创建/推送/合并回 master 与 develop、develop 合并到 master 发布生产；每段为完整命令序列，复制即用。
 
 ## 阶段与 Job
 
@@ -41,8 +41,8 @@
 
 ## Docker 多阶段构建
 
-- **依赖文件检查（必须）**：生成或校验 Dockerfile **之前**须确认项目根目录已存在依赖文件；否则 `uv sync` / `pip install` 会失败。使用 uv 时须有 `pyproject.toml` 与 `uv.lock`（缺一则 uv 安装不了）；使用 pip 时须有 `requirements.txt`。缺文件时应先提示用户创建（如 `uv init`、`uv lock`），再生成 Dockerfile。详见 [assets/dockerfile-python-base.md](../assets/dockerfile-python-base.md)「前置：检查项目依赖文件」。
-- **私有镜像源参考（必须，尤其 Python）**：生成或校验 Dockerfile 时**必须**参考 [assets/dockerfile-python-base.md](../assets/dockerfile-python-base.md)。Python 基础镜像与 pip/uv 安装源均须按该文档配置。
+- **依赖文件检查（必须）**：生成或校验 Dockerfile **之前**须确认项目根目录已存在依赖文件；否则 `uv sync` / `pip install` 会失败。使用 uv 时须有 `pyproject.toml` 与 `uv.lock`（缺一则 uv 安装不了）；使用 pip 时须有 `requirements.txt`。缺文件时应先提示用户创建（如 `uv init`、`uv lock`），再生成 Dockerfile。详见本技能 `assets/backend-python-cicd/dockerfile-python-base.md`「前置：检查项目依赖文件」。
+- **私有镜像源参考（必须，尤其 Python）**：生成或校验 Dockerfile 时**必须**参考本技能 `assets/backend-python-cicd/dockerfile-python-base.md`。Python 基础镜像与 pip/uv 安装源均须按该文档配置。
 - **Python 基础镜像（默认）**：Python 项目 Dockerfile 的 `FROM` **必须**使用 **docker.dic.hillstonenet.com/library/python:3.12-slim**，作为 requirement 与 project 阶段的基镜像，保证构建与运行环境一致且走私有镜像源；pip/uv 安装依赖须使用该文档规定的镜像源，禁止不指定源的 `pip install`。
 | 阶段名     | 用途 | CI 使用 |
 |------------|------|---------|
@@ -82,7 +82,7 @@
 ## 部署方式：dev → prod，必须使用 K8s
 
 - **约定**：部署**必须**为 dev（测试）→ prod（生产）两环境，且**必须**通过 Kubernetes 部署；在 `.gitlab-ci.yml` 中 dev_deploy 调用 `scripts/dev_deploy.sh`，prod_deploy 调用 `scripts/prod_deploy.sh`。
-- **Dev 模板**：使用 `dev_deployment.yaml.tpl`（见 assets/k8s/dev_deployment.yaml.tpl），变量 `${CI_PROJECT_NAME}` 由 envsubst 替换；含 Deployment、Service、Ingress。命名空间 `api-server`，镜像 `docker.dic.hillstonenet.com/private/${CI_PROJECT_NAME}:latest`，ConfigMap `${CI_PROJECT_NAME}-env`，imagePullSecrets `docker-registry`，dnsPolicy None + 指定 nameservers；Ingress host `${CI_PROJECT_NAME}.apistest.dic.hillstonenet.com`，ingressClassName `api-server`。
+- **Dev 模板**：使用 `dev_deployment.yaml.tpl`（见本技能 assets/backend-python-cicd/k8s/dev_deployment.yaml.tpl），变量 `${CI_PROJECT_NAME}` 由 envsubst 替换；含 Deployment、Service、Ingress。命名空间 `api-server`，镜像 `docker.dic.hillstonenet.com/private/${CI_PROJECT_NAME}:latest`，ConfigMap `${CI_PROJECT_NAME}-env`，imagePullSecrets `docker-registry`，dnsPolicy None + 指定 nameservers；Ingress host `${CI_PROJECT_NAME}.apistest.dic.hillstonenet.com`，ingressClassName `api-server`。
 - **dev_deploy.sh 流程**：`kubectl config use-context kubernetes-admin-dev@kubernetes`；若 .env.example 无 `ENV=dev` 则 prepend；若 ConfigMap `${CI_PROJECT_NAME}-env` 不存在则 `kubectl create configmap ... --from-env-file=.env.example -n api-server`；`envsubst < dev_deployment.yaml.tpl > deployment.yaml`（模板路径可为项目内 `k8s/dev_deployment.yaml.tpl` 或 Runner 固定路径如 `/.flaskserver/dev_deployment.yaml.tpl`）；`kubectl apply -f deployment.yaml`；`kubectl rollout restart deployment ${CI_PROJECT_NAME} -n api-server`。
 - **prod_deploy.sh**：切换 context 到 prod（如 `kubernetes-admin-prod@kubernetes`），ENV=prod，可选 prod 专用模板（如不同 Ingress host）；其余同 dev。
 - **前置**：命名空间 api-server、Secret docker-registry 需已在集群中存在；ConfigMap 可由脚本在首次部署时从 .env.example 创建。

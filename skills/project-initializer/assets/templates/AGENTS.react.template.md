@@ -34,7 +34,7 @@
 - HTTP: `src/api/` or `src/services/` (Axios)
 - Tests: Vitest; test dir `test/` or `src/test/` (setup, fixtures, mocks); unit tests next to source as `src/**/*.test.{ts,tsx}`
 
-**Dev proxy:** In `vite.config.ts`, `server.proxy` forwards API requests (e.g. `/api`) to the backend; default target port **5000** — should match the backend’s actual listen port (confirm and update after the backend is initialized).
+**Dev proxy:** In `vite.config.ts`, `server.proxy` forwards API requests (e.g. `/api`) to the backend; default target port **5000** — should match the backend's actual listen port (confirm and update after the backend is initialized).
 
 ---
 
@@ -48,18 +48,14 @@
 
 - Use TypeScript and follow existing project style
 - Organize components and pages under `src/` by feature
-- **Feature/page/component work:** Prefer the **frontend-codegen** skill (if installed: `frontend-codegen` from `Hillstone-Networks/Agent-Skills`) for reuse-first, UI/business separation, data-driven routes, test-first, and function components
-- When adding capabilities, update this AGENTS.md (e.g. append to “Agent memory log”)
+- When adding features/pages/components, prefer reuse-first, UI/business separation, data-driven routes, test-first, and function components
+- When adding capabilities, update this AGENTS.md (e.g. append to "Agent memory log")
 
 ### Test and build
 
 - Unit/component tests: `npm run test` (Vitest + jsdom)
 - Production build: `npm run build`; output in `dist/`
 - Preview build locally: `npm run preview`
-
-### Documentation language
-
-- Repo-level docs and AGENTS.md default to English; use another language if the team agrees.
 
 ---
 

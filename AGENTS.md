@@ -12,6 +12,19 @@
 
 ---
 
+## 项目初始化完成后的协作重点
+
+**在已用 project-initializer 完成初始化的项目中协作时**：无需再关注「如何初始化」「脚手架步骤」「Phase 1–3 的访谈与生成流程」等初始化方法；**只需关注开发过程中的规范与原则性内容**，例如：
+
+- **编码与分层**：按项目类型遵循对应约定（如 Flask 的 `references/flask-backend-codegen.md`、React 的 `references/frontend-codegen.md`）— 复用优先、路由/Service 分层、测试先行、配置进 .env.example 等。
+- **CI/质量**：遵循该项目的 README、AGENTS.md 中已写明的质量门禁、分支策略、SDD 忽略标签，不重做初始化阶段的 CI 配置。
+- **测试与排错**：若项目引用了 QA 规范，按「先根因、后修复」与用例/自动化约定执行，不回头改初始化流程。
+- **多角色/子代理**：若项目已配置 .cursor/agents/*.md，按既有角色与 handoff 协作，无需重新跑角色规划。
+
+即：**初始化是一次性的；日常协作以「开发规范 + 原则」为主，不重复、不纠结初始化细节。**
+
+---
+
 ## 仓库结构
 
 ```
@@ -19,28 +32,18 @@ Agent-Skills/
 ├── README.md           # 仓库说明、安装方式、技能列表
 ├── AGENTS.md           # 本文件 — Agent 共享记忆
 └── skills/
-    ├── project-initializer/
-    │   ├── SKILL.md
-    │   ├── scripts/    # 安装与 SDD 初始化脚本
-    │   ├── references/ # OpenSpec / SpecKit / GSD 参考
-    │   └── assets/
-    │       ├── templates/   # README / AGENTS / CI 模板
-    │       └── scripts/    # CI 用校验脚本（tag、SDD）
-    ├── init-react-frontend/
-    │   ├── SKILL.md
-    │   └── assets/templates/
-    │       └── AGENTS.template.md
-    ├── frontend-codegen/
-    │   └── SKILL.md
-    ├── init-taro-miniapp/
-    │   ├── SKILL.md
-    │   └── assets/templates/
-    │       └── AGENTS.template.md
-    ├── qa-and-testing/
-    │   ├── SKILL.md    # 测试工程师规范（测试计划、用例、自动化、报告）
-    │   └── references/ # 用例格式、优先级、自动化与报告约定
-    └── <skill-name>/   # 每个技能一个目录
-        └── SKILL.md    # 技能定义（含 YAML frontmatter）
+    └── project-initializer/
+        ├── SKILL.md
+        ├── scripts/    # 安装与 SDD 初始化、validate_flask_structure、validate_roles、check_route_layer
+        ├── references/ # OpenSpec / SpecKit / GSD / flask-backend / backend-python-cicd /
+        │               # frontend-codegen / flask-backend-codegen / qa-testing / agent-roles
+        └── assets/
+            ├── templates/   # README、AGENTS、AGENTS.react、AGENTS.taro、gitlab-ci、github-actions
+            ├── flask-backend/
+            ├── backend-python-cicd/
+            ├── flask-backend-codegen/
+            ├── agent-roles/
+            └── scripts/     # CI 用校验脚本（tag、SDD）
 ```
 
 - 技能根目录为 `skills/`，每个技能占一个子目录，目录名即技能 ID（如 `project-initializer`）。
@@ -83,16 +86,14 @@ Agent-Skills/
 
 | 技能 | 说明 |
 |------|------|
-| **project-initializer** | 脚手架新项目：生成 README.md、AGENTS.md、CI/CD 流水线（GitLab CI / GitHub Actions），支持 OpenSpec、SpecKit、GSD 等 SDD 工作流，文档默认中文。 |
-| **init-react-frontend** | 初始化 React 前端项目：默认技术栈为 React + Ant Design + react-router + TypeScript + Zustand + Vitest + jsdom + Tailwind CSS + Axios + Vite + Rolldown，依赖采用生成时最新版本，并生成适配该项目的 AGENTS.md。 |
-| **frontend-codegen** | 前端代码生成：在既有 React 项目中按规范生成功能/页面/组件；复用优先（工具与组件）、UI 与业务分层、数据化路由、测试先行（红/绿）、函数组件；新增第三方库时提供 3 选方案供确认。 |
-| **init-taro-miniapp** | 初始化 Taro 小程序项目：强制使用 `npx @tarojs/cli init <projectName>` 创建项目；初始化后必须执行 npm install，再新建目录、配置接口 dev proxy、可添加/更新 README 与 AGENTS.md，不修改其余文件或配置。 |
+| **project-initializer** | 一站式项目脚手架：README、AGENTS、CI/CD；项目类型「通用 / Flask 后端 / React 前端 / Taro 小程序」及对应初始化内置于本技能。可选 Python+GitLab（backend-python-cicd）、QA/测试规范、多角色与子代理；后续开发约定（frontend-codegen、flask-backend-codegen）见本技能 references。支持 OpenSpec、SpecKit、GSD 等 SDD，文档默认中文。 |
 
-| **qa-and-testing** | QA 与测试规范：编写测试计划、用例、自动化脚本与测试报告；在用户要设计测试策略、编写/评审用例、补充自动化或产出测试文档时使用；遵循用例 ID、步骤预期、优先级与自动化命名约定。 |
-| **agent-roles-and-subagents** | 角色规划与子代理创建：按场景规划多角色定义并生成配置；将角色定义转为 Cursor 子代理（.cursor/agents/*.md）；参考 Cursor 子代理文档；适用于多智能体规划与「Help me create this subagent for Cursor」请求。 |
+（已下线并并入 project-initializer：init-flask-backend、init-react-frontend、init-taro-miniapp、backend-python-cicd、frontend-codegen、flask-backend-codegen、qa-and-testing、agent-roles-and-subagents。）
 
 ---
 
 ## Agent 记忆日志
 
 <!-- 在此追加重要决策或发现，格式：- [YYYY-MM-DD] 内容 -->
+- [2025-03-13] 将 init-flask-backend、init-react-frontend 重新封装进 project-initializer：Phase 1 增加「项目类型」（通用/Flask 后端/React 前端/其他），Phase 2 内联 Flask 与 React 初始化流程与资产；Flask 参考与 assets 迁至 project-initializer；新增 AGENTS.react.template.md；删除 init-flask-backend、init-react-frontend 技能目录。
+- [2025-03-13] 将其余技能全部并入 project-initializer：init-taro-miniapp（项目类型 Taro 小程序、AGENTS.taro.template.md）、backend-python-cicd（references/backend-python-cicd.md、assets/backend-python-cicd/）、frontend-codegen、flask-backend-codegen、qa-and-testing、agent-roles-and-subagents（各 references 与 assets 迁入）；Phase 1 增加问题 11–13（Python+GitLab 规范、QA 规范、多角色/子代理）；Phase 2 增加对应生成与衔接说明。删除 init-taro-miniapp、backend-python-cicd、frontend-codegen、flask-backend-codegen、qa-and-testing、agent-roles-and-subagents 技能目录。

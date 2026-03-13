@@ -43,7 +43,6 @@ def create_app(config_name: str = None):
 def register_all_blueprints(flask_app):
     import os
     import importlib
-    import inspect
     import logging
 
     views_path = os.path.join(os.path.dirname(__file__), "routes")

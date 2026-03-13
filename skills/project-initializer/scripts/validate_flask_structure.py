@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 校验 Flask API 项目目录与必要文件是否符合规范。
-Usage: python validate_structure.py /path/to/project
+Usage: python validate_flask_structure.py /path/to/project
 """
 import sys
 from pathlib import Path
@@ -29,7 +29,7 @@ OPTIONAL = [
 ]
 
 
-def validate(root: Path) -> list[str]:
+def validate(root: Path) -> list:
     errors = []
     root = root.resolve()
     if not root.is_dir():
@@ -42,17 +42,12 @@ def validate(root: Path) -> list[str]:
         elif rel.endswith(".py") and p.suffix == ".py" and not p.is_file():
             errors.append(f"Expected file: {rel}")
 
-    for rel in OPTIONAL:
-        p = root / rel
-        if not p.exists():
-            pass  # optional, only report in verbose mode if needed
-
     return errors
 
 
 def main() -> int:
     if len(sys.argv) < 2:
-        print("Usage: python validate_structure.py /path/to/project", file=sys.stderr)
+        print("Usage: python validate_flask_structure.py /path/to/project", file=sys.stderr)
         return 2
     root = Path(sys.argv[1])
     errors = validate(root)
