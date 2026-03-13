@@ -1,6 +1,6 @@
 ---
 name: cicd-fullstack-flask-react
-description: When user asks to set up CI/CD for a Flask + React fullstack project: detect or ask for frontend and backend directories, generate CI/CD files, then check backend and add static/SPA serving if missing. Use when the user wants CI/CD for fullstack, or to fix backend not serving frontend build.
+description: "When user asks to set up CI/CD for a Flask + React fullstack project: detect or ask for frontend and backend directories, generate CI/CD files, then check backend and add static/SPA serving if missing. Use when the user wants CI/CD for fullstack, or to fix backend not serving frontend build."
 ---
 
 # CI/CD Fullstack Flask + React
